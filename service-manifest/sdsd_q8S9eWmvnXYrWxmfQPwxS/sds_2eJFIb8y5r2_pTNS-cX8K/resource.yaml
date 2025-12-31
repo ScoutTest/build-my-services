@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scoutflo-sa-service-1-brebrwbtb-rj6rp
+  namespace: default
+  annotations:
+    eks.amazonaws.com/role-arn: Y0a49uu3rMGyCOYT9ttkt1nTdkDB3wQllVm2o6KyCwlf1UGhDig+jXhZ/p+vm6M/HxQXeum0bfKuIveGVC7atm52kktMpVp7JW7Q66Qp6Gvu2BS+rLHa7OacHmCBS4H+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-1-brebrwbtb-rj6rp
+  namespace: default
+  labels:
+    app: service-1-brebrwbtb-rj6rp
+spec:
+  type: ClusterIP
+  selector:
+    app: service-1-brebrwbtb-rj6rp
+  ports:
+    - name: https
+      protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-1-brebrwbtb-rj6rp
+  namespace: default
+  labels:
+    app: service-1-brebrwbtb-rj6rp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-1-brebrwbtb-rj6rp
+  template:
+    metadata:
+      labels:
+        app: service-1-brebrwbtb-rj6rp
+    spec:
+      serviceAccountName: scoutflo-sa-service-1-brebrwbtb-rj6rp
+      containers:
+        - name: service-1-brebrwbtb-rj6rp-container
+          image: 296062577626.dkr.ecr.ap-south-1.amazonaws.com/autocd-test-satyam:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 200m
+          env: []
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: service-1-brebrwbtb-rj6rp
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: service-1-brebrwbtb-sds2ejfib8y5r2ptns-cx8k-rj46h.scoutflo.agency
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: service-1-brebrwbtb-rj6rp
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - service-1-brebrwbtb-sds2ejfib8y5r2ptns-cx8k-rj46h.scoutflo.agency
+      secretName: scoutflo-agency-wildcard-tls
