@@ -1,0 +1,31 @@
+name: Test Success
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  success-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo success
+        run: echo "Success ✅"
+      - name: Notify Scoutflo AutoCD
+        run: |
+          curl -X POST https://api.app-server-pp.scoutflo.com/v1/autocd/trigger \
+            -H "Authorization: Bearer ${{ secrets.SCOUTFLO_WEBHOOK_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "provider": "github",
+              "repo": "${{ github.repository }}",
+              "branch": "${{ github.ref_name }}",
+              "commit": "${{ github.sha }}",
+              "images": [
+                {
+                  "registry_provider": "AWS_ECR",
+                  "image_repo": "welcome-scoutflo",
+                  "image_tag": "1.0.0",
+                  "image_digest": "sha256:faa397bdff7f2e5a6d05719524aa14ab216190e4b39ca226e7b74b0c4d99d9cf"
+                }
+              ]
+            }'
