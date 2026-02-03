@@ -31,8 +31,8 @@ jobs:
               {
                 "registry_provider": "AWS_ECR",
                 "image_repo": "welcome-scoutflo",
-                "image_tag": "${{ github.sha }}",
-                "image_digest": "${{ steps.build.outputs.digest }}"
+                "image_tag": "1.0.0",
+                "image_digest": "sha256:faa397bdff7f2e5a6d05719524aa14ab216190e4b39ca226e7b74b0c4d99d9cf"
               }
             ]
           }
