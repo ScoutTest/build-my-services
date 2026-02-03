@@ -1,9 +1,7 @@
 name: Test Success
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   success-job:
@@ -11,12 +9,6 @@ jobs:
     steps:
       - name: Echo success
         run: echo "Success ✅"
-
-      # Example build step (required if you use steps.build.outputs.digest)
-      # - name: Build Image
-      #   id: build
-      #   run: |
-      #     echo "digest=sha256:example" >> $GITHUB_OUTPUT
 
       - name: Notify Scoutflo AutoCD
         run: |
