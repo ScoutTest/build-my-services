@@ -10,20 +10,30 @@ jobs:
       - name: Echo success
         run: echo "Success ✅"
 
+      # Example build step (required if you use steps.build.outputs.digest)
+      # - name: Build Image
+      #   id: build
+      #   run: |
+      #     echo "digest=sha256:example" >> $GITHUB_OUTPUT
+
       - name: Notify Scoutflo AutoCD
         run: |
           curl -X POST https://api.app-server-pp.scoutflo.com/v1/autocd/trigger \
             -H "Authorization: Bearer ${{ secrets.SCOUTFLO_WEBHOOK_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "provider": "github",
-              "service_name": "autocd-service-1",
-              "cloud_connection_id": "cloud-credentials-3679c6df-9435-446d-91e5-7a743c467034",
-              "registry": "AWS_ECR",
-              "image_repo": "welcome-scoutflo",
-              "image_tag": "${{ github.sha }}",
-              "image_digest": "sha256:REPLACE_ME",
-              "repo": "${{ github.repository }}",
-              "branch": "${{ github.ref_name }}",
-              "commit": "${{ github.sha }}"
-            }'
+            -d @- << 'EOF'
+          {
+            "provider": "github",
+            "repo": "${{ github.repository }}",
+            "branch": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "images": [
+              {
+                "registry_provider": "AWS_ECR",
+                "image_repo": "welcome-scoutflo",
+                "image_tag": "${{ github.sha }}",
+                "image_digest": "${{ steps.build.outputs.digest }}"
+              }
+            ]
+          }
+EOF
